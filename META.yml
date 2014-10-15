@@ -22,5 +22,6 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/rustyconover/devel-stacktrace-ashtmlextended/issues
+  homepage: http://search.cpan.org/dist/Devel-StackTrace-AsHTMLExtended/
   repository: git://github.com/rustyconover/devel-stacktrace-ashtmlextended.git
-version: '0.15'
+version: '0.17'

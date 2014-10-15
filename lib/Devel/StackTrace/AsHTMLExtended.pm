@@ -251,7 +251,7 @@ Devel::StackTrace::AsHTMLExtended - Displays stack trace in HTML
   use Devel::StackTrace::AsHTMLExtended;
 
   my $trace = Devel::StackTrace->new;
-  my $html  = $trace->as_html;
+  my $html  = $trace->as_html_extended;
 
 =head1 DESCRIPTION
 
