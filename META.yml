@@ -24,4 +24,4 @@ resources:
   bugtracker: https://github.com/rustyconover/devel-stacktrace-ashtmlextended/issues
   homepage: http://search.cpan.org/dist/Devel-StackTrace-AsHTMLExtended/
   repository: git://github.com/rustyconover/devel-stacktrace-ashtmlextended.git
-version: '0.17'
+version: '0.18'

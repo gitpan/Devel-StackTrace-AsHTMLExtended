@@ -35,6 +35,8 @@ sub render {
     my $trace = shift;
     my %opt   = @_;
 
+    $opt{max_dump_size} ||= 256*1024;
+
     my $msg = $opt{msg} // encode_html($trace->frame(0)->as_string(1));
 
     my $out;
@@ -104,9 +106,9 @@ sub render {
 
         if (!$opt{inline}) {
             $out .= qq{<div class="panel-group" id="accordion-$i">};
-            $out .= _build_arguments($i, $next_frame);
+            $out .= _build_arguments($i, $next_frame, \%opt);
             if ($frame->can('lexicals')) {
-                $out .= _build_lexicals($i, $frame->lexicals)
+                $out .= _build_lexicals($i, $frame->lexicals, \%opt)
             }
             $out .= qq{</div>};
         }
@@ -160,7 +162,7 @@ sub _build_accordian_panel {
 }
 
 sub _build_arguments {
-    my($id, $frame) = @_;
+    my($id, $frame, $opt) = @_;
     my $ref = "arg-$id";
 
     return '' unless $frame && $frame->args;
@@ -175,6 +177,11 @@ sub _build_arguments {
         my $dump = $dumper->($value);
         $html .= qq{<tr>};
         $html .= qq{<td class="variable"><tt>\$_[$idx]</tt></td>};
+
+        if (length($dump) > $opt->{max_dump_size}) {
+            $dump = "[Warning: Truncated to dump limit]\n" . substr($dump, 0, $opt->{max_dump_size});
+        }
+
         $html .= qq{<td class="value"><pre class="pre-scrollable"><code>} . encode_html($dump) . qq{</code></pre></td>};
         $html .= qq{</tr>};
     }
@@ -184,7 +191,7 @@ sub _build_arguments {
 }
 
 sub _build_lexicals {
-    my($id, $lexicals) = @_;
+    my($id, $lexicals, $opt) = @_;
 
     return '' unless keys %$lexicals;
 
@@ -197,6 +204,11 @@ sub _build_lexicals {
         $dump =~ s/^\[(.*)\]$/($1)/s if $var =~ /^\@/;
         $html .= q{<tr>};
         $html .= q{<td class="variable"><tt>} . encode_html($var) . q{</tt></td>};
+
+        if (length($dump) > $opt->{max_dump_size}) {
+            $dump = "[Warning: Truncated to dump limit]\n" . substr($dump, 0, $opt->{max_dump_size});
+        }
+
         $html .= q{<td class="value"><pre class="pre-scrollable"><code>} . encode_html($dump) . q{</code></pre></td>};
         $html .= q{</tr>};
     }
@@ -251,7 +263,9 @@ Devel::StackTrace::AsHTMLExtended - Displays stack trace in HTML
   use Devel::StackTrace::AsHTMLExtended;
 
   my $trace = Devel::StackTrace->new;
-  my $html  = $trace->as_html_extended;
+  my $html  = $trace->as_html_extended(max_dump_size => 256*1024,
+                                       msg => "Error message",
+                                      )
 
 =head1 DESCRIPTION
 
